@@ -2,6 +2,7 @@ package explorewithme.service;
 
 
 import explorewithme.mapper.StatMapper;
+import explorewithme.model.StatResultProjection;
 import explorewithme.model.Stats;
 import explorewithme.repository.StatsRepository;
 import lombok.RequiredArgsConstructor;
@@ -11,6 +12,7 @@ import ru.practicum.dtos.StatRequestDto;
 import ru.practicum.dtos.StatResponseDto;
 
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -33,26 +35,28 @@ public class StatsServiceImpl implements StatsService {
 
     @Override
     public List<StatResponseDto> getStats(LocalDateTime start, LocalDateTime end, String[] uris, boolean unique) {
-        List<Stats> result;
+        List<StatResultProjection> result;
         if (unique) {
             if (uris == null) {
-                result = repository.findDistinctByIpAndTimeStampBetween(start, end);
+                result = repository.findDistinctByIpAndTimeStampBetweenAndNative(start, end);
             } else {
-                result = repository.findDistinctByIpAndTimeStampBetweenAndUriIn(start, end, uris);
+                result = repository.findDistinctByIpAndTimeStampBetweenAndUriInNative(start,
+                        end,
+                        Arrays.stream(uris).collect(Collectors.toList()));
             }
         } else {
             if (uris == null) {
-                result = repository.findStatsByTimeStampBetween(start, end);
+                result = repository.findTimeStampBetweenAndNative(start, end);
             } else {
-                result = repository.findStatsByTimeStampBetweenAndUriIn(start, end, uris);
+                result = repository.findTimeStampBetweenAndUriInNative(start,
+                        end,
+                        Arrays.stream(uris).collect(Collectors.toList()));
             }
         }
-        var responses = result.stream().map(StatMapper::toStatDto)
-                .collect(Collectors.groupingBy(s -> s, Collectors.counting()));
-        responses.forEach(StatResponseDto::setHits);
-
-        return responses.keySet().stream()
+        return result.stream()
+                .map(s -> new StatResponseDto(s.getApp(), s.getUri(), s.getCount()))
                 .sorted(Comparator.comparingLong(StatResponseDto::getHits).reversed())
                 .collect(Collectors.toList());
+
     }
 }
