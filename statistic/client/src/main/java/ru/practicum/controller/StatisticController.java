@@ -4,7 +4,6 @@ package ru.practicum.controller;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.client.StatisticClient;
@@ -14,7 +13,7 @@ import ru.practicum.dtos.StatRequestDto;
 import javax.validation.Valid;
 import java.util.Arrays;
 
-@Controller
+@RestController
 @RequestMapping()
 @RequiredArgsConstructor
 @Slf4j
