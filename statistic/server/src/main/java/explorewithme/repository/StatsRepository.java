@@ -4,7 +4,6 @@ import explorewithme.model.StatResultProjection;
 import explorewithme.model.Stats;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
-import ru.practicum.dtos.StatResponseDto;
 
 import java.time.LocalDateTime;
 import java.util.List;
