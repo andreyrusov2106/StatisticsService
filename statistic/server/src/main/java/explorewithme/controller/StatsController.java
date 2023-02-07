@@ -22,6 +22,7 @@ public class StatsController {
     public StatsController(StatsService statsService) {
         this.statsService = statsService;
     }
+
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("/hit")
     public StatResponseDto createStat(@RequestBody StatRequestDto statRequestDto) {
