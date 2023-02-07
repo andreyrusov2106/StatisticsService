@@ -2,7 +2,6 @@ package ru.practicum.compilation.dto;
 
 import lombok.*;
 import lombok.experimental.NonFinal;
-import ru.practicum.event.dto.EventDtoShortResponse;
 
 import javax.validation.constraints.NotNull;
 import java.util.List;

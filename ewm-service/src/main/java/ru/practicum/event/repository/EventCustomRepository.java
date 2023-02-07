@@ -2,7 +2,6 @@ package ru.practicum.event.repository;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.repository.JpaRepository;
 import ru.practicum.category.model.Category;
 import ru.practicum.event.model.Event;
 import ru.practicum.event.model.State;
@@ -13,6 +12,7 @@ import java.util.Collection;
 import java.util.List;
 
 public interface EventCustomRepository {
+
     Page<Event> findEventsByInitiatorIn(List<User> initiator,
                                         List<State> states,
                                         LocalDateTime eventDate,

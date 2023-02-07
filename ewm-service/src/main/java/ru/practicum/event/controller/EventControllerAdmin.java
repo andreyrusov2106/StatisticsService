@@ -20,19 +20,21 @@ public class EventControllerAdmin {
     public EventControllerAdmin(EventService eventService) {
         this.eventService = eventService;
     }
+
     @GetMapping()
     public List<EventDtoResponse> findAll(@RequestParam(name = "text", required = false) Long[] userIds,
-                                               @RequestParam(name = "states", required = false) String[] states,
-                                               @RequestParam(name = "categories", required = false) Long[] categories,
-                                               @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime rangeStart,
-                                               @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime rangeEnd,
-                                               @RequestParam(name = "from", required = false, defaultValue = "0") Integer from,
-                                               @RequestParam(name = "size", required = false, defaultValue = "10") Integer size) {
-        return eventService.getAllEventsAdmin(userIds, states, categories, rangeStart, rangeEnd, from,size);
+                                          @RequestParam(name = "states", required = false) String[] states,
+                                          @RequestParam(name = "categories", required = false) Long[] categories,
+                                          @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime rangeStart,
+                                          @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime rangeEnd,
+                                          @RequestParam(name = "from", required = false, defaultValue = "0") Integer from,
+                                          @RequestParam(name = "size", required = false, defaultValue = "10") Integer size) {
+        return eventService.getAllEventsAdmin(userIds, states, categories, rangeStart, rangeEnd, from, size);
     }
+
     @PatchMapping("/{eventId}")
     public EventDtoResponse updateEvent(@PathVariable Long eventId,
-                            @Valid @RequestBody UpdateEventUserRequest eventDtoRequest) {
+                                        @Valid @RequestBody UpdateEventUserRequest eventDtoRequest) {
 
         return eventService.updateEventAdmin(eventId, eventDtoRequest);
     }

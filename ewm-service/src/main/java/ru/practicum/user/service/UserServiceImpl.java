@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
-import ru.practicum.exceptions.BadRequestException;
 import ru.practicum.exceptions.ResourceNotFoundException;
 import ru.practicum.user.dto.UserDto;
 import ru.practicum.user.mapper.UserMapper;
@@ -48,13 +47,12 @@ public class UserServiceImpl implements UserService {
     @Override
     public List<UserDto> getAllUsers(Long[] ids, Integer from, Integer size) {
         Pageable pageable = sizeAndFromToPageable(from, size);
-        if(ids==null){
+        if (ids == null) {
             return repository.findAll(pageable).stream()
                     .map(UserMapper::toUserDto)
                     .collect(Collectors.toList());
-        }
-        else {
-            return repository.findUsersByIdIn(List.of(ids),pageable).stream()
+        } else {
+            return repository.findUsersByIdIn(List.of(ids), pageable).stream()
                     .map(UserMapper::toUserDto)
                     .collect(Collectors.toList());
         }

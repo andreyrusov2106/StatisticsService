@@ -20,12 +20,13 @@ public class UserController {
     }
 
     @GetMapping()
-    public List<UserDto> findAll(@RequestParam(name = "ids", required = true) Long[] ids,
+    public List<UserDto> findAll(@RequestParam(name = "ids") Long[] ids,
                                  @RequestParam(name = "from", required = false, defaultValue = "0") Integer from,
                                  @RequestParam(name = "size", required = false, defaultValue = "10") Integer size
-                                 ) {
-        return userService.getAllUsers(ids,from,size);
+    ) {
+        return userService.getAllUsers(ids, from, size);
     }
+
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping()
     public UserDto createUser(@Valid @RequestBody UserDto userDto) {
@@ -42,6 +43,7 @@ public class UserController {
     public UserDto getUser(@PathVariable Long id) {
         return userService.getUser(id);
     }
+
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @DeleteMapping("/{userId}")
     public void removeUser(@PathVariable Long userId) {
