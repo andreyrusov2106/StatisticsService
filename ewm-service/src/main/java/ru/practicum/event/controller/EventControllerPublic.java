@@ -33,16 +33,15 @@ public class EventControllerPublic {
                                                @RequestParam(name = "from", required = false, defaultValue = "0") Integer from,
                                                @RequestParam(name = "size", required = false, defaultValue = "10") Integer size,
                                                HttpServletRequest request) {
-        return eventService.getAllEventsPublic(text, categories, paid, onlyAvailable, rangeStart, rangeEnd,sort, from,size, request);
+        return eventService.getAllEventsPublic(text, categories, paid, onlyAvailable, rangeStart, rangeEnd, sort, from, size, request);
     }
-
-
 
     @GetMapping("/{id}")
     public EventDtoResponse getEvent(@PathVariable Long id,
                                      HttpServletRequest request) {
         return eventService.getEventPublic(id, request);
     }
+
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @DeleteMapping("/{userId}")
     public void removeEvent(@PathVariable Long userId) {
