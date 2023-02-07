@@ -4,6 +4,7 @@ package explorewithme.controller;
 import explorewithme.service.StatsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.dtos.StatRequestDto;
 import ru.practicum.dtos.StatResponseDto;
@@ -21,7 +22,7 @@ public class StatsController {
     public StatsController(StatsService statsService) {
         this.statsService = statsService;
     }
-
+    @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("/hit")
     public StatResponseDto createStat(@RequestBody StatRequestDto statRequestDto) {
         return statsService.createStat(statRequestDto);

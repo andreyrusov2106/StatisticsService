@@ -26,7 +26,7 @@ public class StatsServiceImpl implements StatsService {
     @Override
     public StatResponseDto createStat(StatRequestDto statRequestDto) {
         Stats stats = new Stats();
-        stats.setTimeStamp(LocalDateTime.now());
+        stats.setTimeStamp(LocalDateTime.now().withNano(0));
         StatMapper.toStat(stats, statRequestDto);
         Stats createdStat = repository.save(stats);
         log.info("Stat created" + createdStat);
