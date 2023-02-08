@@ -2,15 +2,11 @@ package ru.practicum.event.repository;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
-import ru.practicum.category.model.Category;
 import ru.practicum.event.model.Event;
 
 import ru.practicum.user.model.User;
 
-import java.time.LocalDateTime;
-import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 

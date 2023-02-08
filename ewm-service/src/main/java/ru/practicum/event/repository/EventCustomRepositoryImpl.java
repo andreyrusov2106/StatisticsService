@@ -62,7 +62,6 @@ public class EventCustomRepositoryImpl implements EventCustomRepository {
     }
 
 
-
     public Page<Event> findAllEventsForPublicCustom(String annotation,
                                                     String description,
                                                     LocalDateTime start,
@@ -73,8 +72,8 @@ public class EventCustomRepositoryImpl implements EventCustomRepository {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<Event> cq = cb.createQuery(Event.class);
         Root<Event> root = cq.from(Event.class);
-        Predicate annotationPredicate = cb.like(cb.lower(root.get("annotation")), "%"+annotation.toLowerCase()+"%");
-        Predicate descriptionPredicate = cb.like(cb.lower(root.get("description")), "%"+description.toLowerCase()+"%");
+        Predicate annotationPredicate = cb.like(cb.lower(root.get("annotation")), "%" + annotation.toLowerCase() + "%");
+        Predicate descriptionPredicate = cb.like(cb.lower(root.get("description")), "%" + description.toLowerCase() + "%");
         Predicate paidPredicate = cb.equal(root.get("paid"), paid);
         Predicate categoryPredicate = category.size() != 0 ? cb.equal(root.get("category"), category) : cb.conjunction();
         Predicate eventDatePredicate;
@@ -88,7 +87,7 @@ public class EventCustomRepositoryImpl implements EventCustomRepository {
             }
         }
 
-        cq.where(cb.or(annotationPredicate, descriptionPredicate),paidPredicate, categoryPredicate, eventDatePredicate);
+        cq.where(cb.or(annotationPredicate, descriptionPredicate), paidPredicate, categoryPredicate, eventDatePredicate);
         TypedQuery<Event> query = entityManager.createQuery(cq);
         int totalRows = query.getResultList().size();
 
