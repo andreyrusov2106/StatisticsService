@@ -32,7 +32,7 @@ public class StatsController {
     @GetMapping("/stats")
     public List<StatResponseDto> getStat(@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime start,
                                          @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime end,
-                                         @RequestParam(name = "uris") String[] uris,
+                                         @RequestParam(name = "uris") List<String> uris,
                                          @RequestParam(name = "unique", defaultValue = "false") boolean unique) {
         return statsService.getStats(start, end, uris, unique);
     }

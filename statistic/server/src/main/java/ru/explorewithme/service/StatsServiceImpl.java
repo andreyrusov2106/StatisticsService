@@ -35,12 +35,9 @@ public class StatsServiceImpl implements StatsService {
     }
 
     @Override
-    public List<StatResponseDto> getStats(LocalDateTime start, LocalDateTime end, String[] uris, boolean unique) {
+    public List<StatResponseDto> getStats(LocalDateTime start, LocalDateTime end, List<String> uris, boolean unique) {
         List<StatResultProjection> result;
-        result = repository.getAuthorStatistic(start,
-                end,
-                Arrays.stream(uris).collect(Collectors.toList())
-                , true);
+        result = repository.getAuthorStatistic(start, end, uris, unique);
 
         return result.stream()
                 .map(s -> new StatResponseDto(s.getApp(), s.getUri(), s.getCount()))

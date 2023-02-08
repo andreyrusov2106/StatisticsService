@@ -11,5 +11,5 @@ import java.util.List;
 public interface StatsService {
     StatResponseDto createStat(StatRequestDto userDto);
 
-    List<StatResponseDto> getStats(LocalDateTime start, LocalDateTime end, String[] uris, boolean unique);
+    List<StatResponseDto> getStats(LocalDateTime start, LocalDateTime end, List<String> uris, boolean unique);
 }
