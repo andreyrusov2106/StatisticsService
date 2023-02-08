@@ -12,6 +12,7 @@ public abstract class BaseRepositoryImpl<T, T1> extends SimpleJpaRepository<T, T
     JPAQueryFactory jpaQueryFactory;
     protected final QStats stats = QStats.stats;
 
+
     public BaseRepositoryImpl(Class<T> domainClass, EntityManager em) {
         super(domainClass, em);
         this.em = em;
