@@ -6,7 +6,7 @@ import ru.explorewithme.model.QStats;
 
 import javax.persistence.EntityManager;
 
-public abstract class BaseRepositoryImpl<T, Id> extends SimpleJpaRepository<T, Id> implements BaseRepository<T, Id> {
+public abstract class BaseRepositoryImpl<T, T1> extends SimpleJpaRepository<T, T1> implements BaseRepository<T, T1> {
 
     EntityManager em;
     JPAQueryFactory jpaQueryFactory;
