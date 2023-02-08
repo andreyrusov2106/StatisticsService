@@ -20,9 +20,9 @@ public interface EventService {
 
     void removeEventPublic(Long id);
 
-    List<EventDtoShortResponse> getAllEventsPublic(String text, String[] categories, Boolean paid, Boolean onlyAvailable, LocalDateTime start, LocalDateTime end, String sort, Integer from, Integer size, HttpServletRequest request);
+    List<EventDtoShortResponse> getAllEventsPublic(String text, List<String> categories, Boolean paid, Boolean onlyAvailable, LocalDateTime start, LocalDateTime end, String sort, Integer from, Integer size, HttpServletRequest request);
 
-    List<EventDtoResponse> getAllEventsAdmin(Long[] users, String[] states, Long[] categories, LocalDateTime start, LocalDateTime end, Integer from, Integer size);
+    List<EventDtoResponse> getAllEventsAdmin(List<Long> users, List<String> states, List<Long> categories, LocalDateTime start, LocalDateTime end, Integer from, Integer size);
 
     List<EventDtoShortResponse> getAllEventsPrivate(Long userId, Integer from, Integer size);
 

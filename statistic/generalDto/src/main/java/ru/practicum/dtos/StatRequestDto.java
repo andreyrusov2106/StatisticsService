@@ -7,7 +7,8 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Data
+@Getter
+@Setter
 public class StatRequestDto {
     protected Long id;
     protected String app;

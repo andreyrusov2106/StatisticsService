@@ -26,8 +26,7 @@ public class CompilationServiceImpl implements CompilationService {
 
     @Override
     public CompilationDtoResponse createCompilationAdmin(CompilationDtoRequest categoryDto) {
-        Compilation compilation = new Compilation();
-        CompilationMapper.toCompilation(compilation, categoryDto);
+        Compilation compilation = CompilationMapper.toCompilation(new Compilation(), categoryDto);
         if (categoryDto.getEvents() != null) {
             compilation.setEvents(eventRepository.findAllByIdIn(categoryDto.getEvents()));
         }
@@ -39,18 +38,19 @@ public class CompilationServiceImpl implements CompilationService {
     @Override
     public CompilationDtoResponse updateCompilationAdmin(Long id, CompilationDtoRequest categoryDto) {
         Compilation updatedCategory;
-        var category = repository.findById(id);
-        if (category.isPresent()) {
-            CompilationMapper.toCompilation(category.get(), categoryDto);
-            category.get().setId(id);
+        var compilationOptional = repository.findById(id);
+        if (compilationOptional.isPresent()) {
+            var compilation = compilationOptional.get();
+            CompilationMapper.toCompilation(compilation, categoryDto);
+            compilation.setId(id);
             if (categoryDto.getEvents() != null) {
-                category.get().setEvents(eventRepository.findAllByIdIn(categoryDto.getEvents()));
+                compilation.setEvents(eventRepository.findAllByIdIn(categoryDto.getEvents()));
             }
-            updatedCategory = repository.save(category.get());
+            updatedCategory = repository.save(compilation);
             log.info("Category updated" + updatedCategory);
             return CompilationMapper.toCompilationDto(updatedCategory);
         } else {
-            throw new ResourceNotFoundException("Category not found");
+            throw new ResourceNotFoundException(String.format("Compilation with id=%d not found",id));
         }
     }
 

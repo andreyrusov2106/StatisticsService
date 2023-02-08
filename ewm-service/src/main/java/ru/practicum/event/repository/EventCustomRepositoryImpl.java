@@ -28,12 +28,12 @@ public class EventCustomRepositoryImpl implements EventCustomRepository {
     }
 
     @Override
-    public Page<Event> findEventsByInitiatorIn(List<User> initiators,
-                                               List<State> states,
-                                               LocalDateTime start,
-                                               LocalDateTime end,
-                                               Collection<Category> category,
-                                               Pageable pageable) {
+    public Page<Event> findAllEventsForAdminCustom(List<User> initiators,
+                                                   List<State> states,
+                                                   LocalDateTime start,
+                                                   LocalDateTime end,
+                                                   Collection<Category> category,
+                                                   Pageable pageable) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<Event> cq = cb.createQuery(Event.class);
         Root<Event> root = cq.from(Event.class);
@@ -52,6 +52,43 @@ public class EventCustomRepositoryImpl implements EventCustomRepository {
         }
 
         cq.where(usersPredicate, statesPredicate, categoryPredicate, eventDatePredicate);
+        TypedQuery<Event> query = entityManager.createQuery(cq);
+        int totalRows = query.getResultList().size();
+
+        query.setFirstResult(pageable.getPageNumber() * pageable.getPageSize());
+        query.setMaxResults(pageable.getPageSize());
+        return new PageImpl<>(query.getResultList(), pageable, totalRows);
+
+    }
+
+
+
+    public Page<Event> findAllEventsForPublicCustom(String annotation,
+                                                    String description,
+                                                    LocalDateTime start,
+                                                    LocalDateTime end,
+                                                    Boolean paid,
+                                                    Collection<Category> category,
+                                                    Pageable pageable) {
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+        CriteriaQuery<Event> cq = cb.createQuery(Event.class);
+        Root<Event> root = cq.from(Event.class);
+        Predicate annotationPredicate = cb.like(cb.lower(root.get("annotation")), "%"+annotation.toLowerCase()+"%");
+        Predicate descriptionPredicate = cb.like(cb.lower(root.get("description")), "%"+description.toLowerCase()+"%");
+        Predicate paidPredicate = cb.equal(root.get("paid"), paid);
+        Predicate categoryPredicate = category.size() != 0 ? cb.equal(root.get("category"), category) : cb.conjunction();
+        Predicate eventDatePredicate;
+        if (start != null && end != null) {
+            eventDatePredicate = cb.between(root.get("eventDate"), start, end);
+        } else {
+            if (start != null) {
+                eventDatePredicate = cb.greaterThan(root.get("eventDate"), start);
+            } else {
+                eventDatePredicate = cb.conjunction();
+            }
+        }
+
+        cq.where(cb.or(annotationPredicate, descriptionPredicate),paidPredicate, categoryPredicate, eventDatePredicate);
         TypedQuery<Event> query = entityManager.createQuery(cq);
         int totalRows = query.getResultList().size();
 

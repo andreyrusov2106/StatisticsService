@@ -12,8 +12,9 @@ public class CategoryMapper {
                 .build();
     }
 
-    public static void toCategory(Category category, CategoryDto categoryDto) {
+    public static Category toCategory(Category category, CategoryDto categoryDto) {
         if (categoryDto.getId() != null) category.setId(categoryDto.getId());
         if (categoryDto.getName() != null) category.setName(categoryDto.getName());
+        return category;
     }
 }

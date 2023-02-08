@@ -1,7 +1,7 @@
-package explorewithme.mapper;
+package ru.explorewithme.mapper;
 
 
-import explorewithme.model.Stats;
+import ru.explorewithme.model.Stats;
 import ru.practicum.dtos.StatRequestDto;
 import ru.practicum.dtos.StatResponseDto;
 

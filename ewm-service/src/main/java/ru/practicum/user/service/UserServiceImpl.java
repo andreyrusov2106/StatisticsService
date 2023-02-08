@@ -22,8 +22,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDto createUser(UserDto userDto) {
-        User user = new User();
-        UserMapper.toUser(user, userDto);
+        var user = UserMapper.toUser(new User(), userDto);
         User createdUser = repository.save(user);
         log.info("User created" + createdUser);
         return UserMapper.toUserDto(createdUser);
@@ -32,15 +31,16 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDto updateUser(Long id, UserDto userDto) {
         User updatedUser;
-        var user = repository.findById(id);
-        if (user.isPresent()) {
-            UserMapper.toUser(user.get(), userDto);
-            user.get().setId(id);
-            updatedUser = repository.save(user.get());
+        var userOptional = repository.findById(id);
+        if (userOptional.isPresent()) {
+            var user = userOptional.get();
+            UserMapper.toUser(user, userDto);
+            user.setId(id);
+            updatedUser = repository.save(user);
             log.info("User updated" + updatedUser);
             return UserMapper.toUserDto(updatedUser);
         } else {
-            throw new ResourceNotFoundException("User not found");
+            throw new ResourceNotFoundException(String.format("User with id=%d not found", id));
         }
     }
 
@@ -62,7 +62,7 @@ public class UserServiceImpl implements UserService {
     public UserDto getUser(Long id) {
         var user = repository.findById(id);
         if (user.isEmpty()) {
-            throw new ResourceNotFoundException("User not found");
+            throw new ResourceNotFoundException(String.format("User with id=%d not found", id));
         }
         return UserMapper.toUserDto(user.get());
     }

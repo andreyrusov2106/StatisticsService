@@ -43,7 +43,7 @@ public class EventMapper {
                 .build();
     }
 
-    public static void toEvent(Event event, EventDtoRequest eventDto) {
+    public static Event toEvent(Event event, EventDtoRequest eventDto) {
         if (eventDto.getId() != null) event.setId(eventDto.getId());
         if (eventDto.getAnnotation() != null) event.setAnnotation(eventDto.getAnnotation());
         if (eventDto.getTitle() != null) event.setTitle(eventDto.getTitle());
@@ -53,10 +53,11 @@ public class EventMapper {
         if (eventDto.getLocation() != null) event.setLocation(eventDto.getLocation());
         if (eventDto.getRequestModeration() != null) event.setRequestModeration(eventDto.getRequestModeration());
         if (eventDto.getParticipantLimit() != null) event.setParticipantLimit(eventDto.getParticipantLimit());
+        return event;
 
     }
 
-    public static void toEvent(Event event, UpdateEventUserRequest eventDto) {
+    public static Event toEvent(Event event, UpdateEventUserRequest eventDto) {
         if (eventDto.getId() != null) event.setId(eventDto.getId());
         if (eventDto.getAnnotation() != null) event.setAnnotation(eventDto.getAnnotation());
         if (eventDto.getTitle() != null) event.setTitle(eventDto.getTitle());
@@ -66,6 +67,6 @@ public class EventMapper {
         if (eventDto.getLocation() != null) event.setLocation(eventDto.getLocation());
         if (eventDto.getRequestModeration() != null) event.setRequestModeration(eventDto.getRequestModeration());
         if (eventDto.getParticipantLimit() != null) event.setParticipantLimit(eventDto.getParticipantLimit());
-
+        return event;
     }
 }

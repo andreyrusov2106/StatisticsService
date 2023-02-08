@@ -24,7 +24,7 @@ public class EventControllerPublic {
 
     @GetMapping()
     public List<EventDtoShortResponse> findAll(@RequestParam(name = "text", required = false) String text,
-                                               @RequestParam(name = "categories", required = false) String[] categories,
+                                               @RequestParam(name = "categories", required = false) List<String> categories,
                                                @RequestParam(name = "paid", required = false) Boolean paid,
                                                @RequestParam(name = "onlyAvailable", defaultValue = "false", required = false) Boolean onlyAvailable,
                                                @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime rangeStart,

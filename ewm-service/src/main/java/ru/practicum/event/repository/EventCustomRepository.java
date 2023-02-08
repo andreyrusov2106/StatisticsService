@@ -13,10 +13,18 @@ import java.util.List;
 
 public interface EventCustomRepository {
 
-    Page<Event> findEventsByInitiatorIn(List<User> initiator,
-                                        List<State> states,
-                                        LocalDateTime eventDate,
-                                        LocalDateTime eventDate2,
-                                        Collection<Category> category,
-                                        Pageable pageable);
+    Page<Event> findAllEventsForAdminCustom(List<User> initiator,
+                                            List<State> states,
+                                            LocalDateTime eventDate,
+                                            LocalDateTime eventDate2,
+                                            Collection<Category> category,
+                                            Pageable pageable);
+
+    Page<Event> findAllEventsForPublicCustom(String annotation,
+                                             String description,
+                                             LocalDateTime start,
+                                             LocalDateTime end,
+                                             Boolean paid,
+                                             Collection<Category> category,
+                                             Pageable pageable);
 }

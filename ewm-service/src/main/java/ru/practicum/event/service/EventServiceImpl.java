@@ -31,7 +31,6 @@ import ru.practicum.user.repository.UserRepository;
 import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -51,13 +50,13 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public EventDtoResponse createEventPrivate(Long userId, EventDtoRequest eventDto) {
-        Event event = new Event();
+
         if (eventDto.getEventDate().isBefore(LocalDateTime.now().plusHours(2))) {
             throw new ConflictException("Incorrect event date");
         }
-        event.setCreatedOn(LocalDateTime.now().withNano(0));
+        Event event = EventMapper.toEvent(new Event(), eventDto);
         event.setState(State.PENDING);
-        EventMapper.toEvent(event, eventDto);
+        event.setCreatedOn(LocalDateTime.now().withNano(0));
         var initiator = userRepository.findById(userId);
         if (initiator.isEmpty()) {
             throw new ResourceNotFoundException(String.format("User with id=%d not found", userId));
@@ -82,31 +81,32 @@ public class EventServiceImpl implements EventService {
         if (eventDto.getEventDate() != null && eventDto.getEventDate().isBefore(LocalDateTime.now().plusHours(2))) {
             throw new ConflictException("Incorrect event date");
         }
-        var event = eventRepository.findById(eventId);
-        if (event.isPresent()) {
-            if (event.get().getInitiator().getId().equals(userId)) {
-                if (event.get().getState() == State.PUBLISHED) {
+        var eventOptional = eventRepository.findById(eventId);
+        if (eventOptional.isPresent()) {
+            var event = eventOptional.get();
+            if (event.getInitiator().getId().equals(userId)) {
+                if (event.getState() == State.PUBLISHED) {
                     throw new ConflictException("Can not be changed");
                 }
-                EventMapper.toEvent(event.get(), eventDto);
+                EventMapper.toEvent(event, eventDto);
                 if (eventDto.getStateAction() != null) {
-                    event.get().setState(StateAction.stringToState(eventDto.getStateAction()));
+                    event.setState(StateAction.stringToState(eventDto.getStateAction()));
                 }
-                event.get().setId(eventId);
-                updatedEvent = eventRepository.save(event.get());
+                event.setId(eventId);
+                updatedEvent = eventRepository.save(event);
                 log.info("Event updated" + updatedEvent);
                 return EventMapper.toEventDto(updatedEvent);
             } else {
                 throw new ResourceNotFoundException("Initiator is not correct");
             }
         } else {
-            throw new ResourceNotFoundException("Event not found");
+            throw new ResourceNotFoundException(String.format("Event with id=%d not found",eventId));
         }
     }
 
     @Override
     public List<EventDtoShortResponse> getAllEventsPublic(String text,
-                                                          String[] categories,
+                                                          List<String> categories,
                                                           Boolean paid,
                                                           Boolean onlyAvailable,
                                                           LocalDateTime start,
@@ -123,19 +123,19 @@ public class EventServiceImpl implements EventService {
         client.createStatistic(statRequestDto);
         List<Category> categoryList = new ArrayList<>();
         if (categories != null) {
-            categoryList = categoryRepository.findAllByNameIn(Arrays.stream(categories).collect(Collectors.toList()));
+            categoryList = categoryRepository.findAllByNameIn(categories);
         }
 
-        return eventRepository.findEventsByAnnotationContainingIgnoreCaseOrDescriptionIgnoreCaseAndEventDateBetweenAndPaidAndCategoryIn(text, text, start, end, paid, categoryList, pageable)
+        return eventRepository.findAllEventsForPublicCustom(text, text, start, end, paid, categoryList, pageable)
                 .stream()
                 .map(EventMapper::toEventShortDto)
                 .collect(Collectors.toList());
     }
 
     @Override
-    public List<EventDtoResponse> getAllEventsAdmin(Long[] users,
-                                                    String[] states,
-                                                    Long[] categories,
+    public List<EventDtoResponse> getAllEventsAdmin(List<Long> users,
+                                                    List<String> states,
+                                                    List<Long> categories,
                                                     LocalDateTime start,
                                                     LocalDateTime end,
                                                     Integer from,
@@ -145,18 +145,18 @@ public class EventServiceImpl implements EventService {
         List<State> stateList = Collections.emptyList();
         List<User> userList = Collections.emptyList();
         if (categories != null) {
-            categoryList = categoryRepository.findAllByIdIn(Arrays.stream(categories).collect(Collectors.toList()));
+            categoryList = categoryRepository.findAllByIdIn(categories);
             if (categoryList.size() == 0) {
                 categoryList = Collections.emptyList();
             }
         }
         if (states != null) {
-            stateList = Arrays.stream(states).map(State::stringToState).collect(Collectors.toList());
+            stateList = states.stream().map(State::stringToState).collect(Collectors.toList());
         }
         if (users != null) {
-            userList = userRepository.findUsersByIdIn(Arrays.stream(users).collect(Collectors.toList()));
+            userList = userRepository.findUsersByIdIn(users);
         }
-        return eventRepository.findEventsByInitiatorIn(userList, stateList, start, end, categoryList, pageable)
+        return eventRepository.findAllEventsForAdminCustom(userList, stateList, start, end, categoryList, pageable)
                 .stream()
                 .map(EventMapper::toEventDto)
                 .collect(Collectors.toList());
@@ -209,36 +209,37 @@ public class EventServiceImpl implements EventService {
             throw new ConflictException("EventDate has to be after now +1Hour");
         }
 
-        var event = eventRepository.findById(eventId);
-        if (event.isPresent()) {
+        var eventOptional = eventRepository.findById(eventId);
+        if (eventOptional.isPresent()) {
+            var event = eventOptional.get();
             if (eventDtoRequest.getStateAction() != null) {
-                if (StateAction.stringToState(eventDtoRequest.getStateAction()) == event.get().getState()) {
+                if (StateAction.stringToState(eventDtoRequest.getStateAction()) == event.getState()) {
                     throw new ConflictException("StateAction is the same as State");
                 }
                 if (StateAction.stringToStateAction(eventDtoRequest.getStateAction()) == StateAction.PUBLISH_EVENT
-                        && event.get().getState() == State.CANCELED) {
+                        && event.getState() == State.CANCELED) {
                     throw new ConflictException("Incorrect StateAction");
                 }
                 if (StateAction.stringToStateAction(eventDtoRequest.getStateAction()) == StateAction.REJECT_EVENT
-                        && event.get().getState() == State.PUBLISHED) {
+                        && event.getState() == State.PUBLISHED) {
                     throw new ConflictException("Incorrect StateAction");
                 }
             }
-            EventMapper.toEvent(event.get(), eventDtoRequest);
+            EventMapper.toEvent(event, eventDtoRequest);
             if (StateAction.stringToStateAction(eventDtoRequest.getStateAction()) == StateAction.PUBLISH_EVENT) {
-                event.get().setPublishedOn(LocalDateTime.now().withNano(0));
+                event.setPublishedOn(LocalDateTime.now().withNano(0));
             }
-            event.get().setState(StateAction.stringToState(eventDtoRequest.getStateAction()));
-            event.get().setId(eventId);
+            event.setState(StateAction.stringToState(eventDtoRequest.getStateAction()));
+            event.setId(eventId);
             if (eventDtoRequest.getLocation() != null) {
                 Location createdLocation = locationRepository.save(eventDtoRequest.getLocation());
-                event.get().setLocation(createdLocation);
+                event.setLocation(createdLocation);
             }
-            updatedEvent = eventRepository.save(event.get());
+            updatedEvent = eventRepository.save(event);
             log.info("Event updated" + updatedEvent);
             return EventMapper.toEventDto(updatedEvent);
         } else {
-            throw new ResourceNotFoundException("Event not found");
+            throw new ResourceNotFoundException(String.format("Event with id=%d not found",eventId));
         }
     }
 
@@ -252,7 +253,7 @@ public class EventServiceImpl implements EventService {
         client.createStatistic(statRequestDto);
         var user = eventRepository.findById(id);
         if (user.isEmpty()) {
-            throw new ResourceNotFoundException("User not found");
+            throw new ResourceNotFoundException(String.format("User with id=%d not found",id));
         }
         return EventMapper.toEventDto(user.get());
     }

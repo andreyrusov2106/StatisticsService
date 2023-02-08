@@ -1,7 +1,7 @@
-package explorewithme.controller;
+package ru.explorewithme.controller;
 
 
-import explorewithme.service.StatsService;
+import ru.explorewithme.service.StatsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;

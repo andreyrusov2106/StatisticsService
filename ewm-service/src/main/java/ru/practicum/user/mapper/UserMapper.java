@@ -13,9 +13,10 @@ public class UserMapper {
                 .build();
     }
 
-    public static void toUser(User user, UserDto userDto) {
+    public static User toUser(User user, UserDto userDto) {
         if (userDto.getId() != null) user.setId(userDto.getId());
         if (userDto.getName() != null) user.setName(userDto.getName());
         if (userDto.getEmail() != null) user.setEmail(userDto.getEmail());
+        return user;
     }
 }

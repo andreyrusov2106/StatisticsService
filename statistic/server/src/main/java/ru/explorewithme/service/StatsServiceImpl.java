@@ -1,10 +1,10 @@
-package explorewithme.service;
+package ru.explorewithme.service;
 
 
-import explorewithme.mapper.StatMapper;
-import explorewithme.model.StatResultProjection;
-import explorewithme.model.Stats;
-import explorewithme.repository.StatsRepository;
+import ru.explorewithme.mapper.StatMapper;
+import ru.explorewithme.model.StatResultProjection;
+import ru.explorewithme.model.Stats;
+import ru.explorewithme.repository.StatsRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -21,6 +21,7 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class StatsServiceImpl implements StatsService {
+
     private final StatsRepository repository;
 
     @Override
@@ -36,23 +37,11 @@ public class StatsServiceImpl implements StatsService {
     @Override
     public List<StatResponseDto> getStats(LocalDateTime start, LocalDateTime end, String[] uris, boolean unique) {
         List<StatResultProjection> result;
-        if (unique) {
-            if (uris == null) {
-                result = repository.findDistinctByIpAndTimeStampBetweenAndNative(start, end);
-            } else {
-                result = repository.findDistinctByIpAndTimeStampBetweenAndUriInNative(start,
-                        end,
-                        Arrays.stream(uris).collect(Collectors.toList()));
-            }
-        } else {
-            if (uris == null) {
-                result = repository.findTimeStampBetweenAndNative(start, end);
-            } else {
-                result = repository.findTimeStampBetweenAndUriInNative(start,
-                        end,
-                        Arrays.stream(uris).collect(Collectors.toList()));
-            }
-        }
+        result = repository.getAuthorStatistic(start,
+                end,
+                Arrays.stream(uris).collect(Collectors.toList())
+                , true);
+
         return result.stream()
                 .map(s -> new StatResponseDto(s.getApp(), s.getUri(), s.getCount()))
                 .sorted(Comparator.comparingLong(StatResponseDto::getHits).reversed())

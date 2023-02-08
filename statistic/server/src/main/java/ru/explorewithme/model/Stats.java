@@ -1,4 +1,4 @@
-package explorewithme.model;
+package ru.explorewithme.model;
 
 import lombok.*;
 
@@ -16,11 +16,11 @@ public class Stats {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column(name = "app", nullable = false)
+    @Column(nullable = false)
     private String app;
-    @Column(name = "uri", nullable = false)
+    @Column(nullable = false)
     private String uri;
-    @Column(name = "ip", nullable = false)
+    @Column(nullable = false)
     private String ip;
     @Column(name = "created")
     private LocalDateTime timeStamp;

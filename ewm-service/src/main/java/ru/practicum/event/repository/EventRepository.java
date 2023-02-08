@@ -2,6 +2,7 @@ package ru.practicum.event.repository;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import ru.practicum.category.model.Category;
 import ru.practicum.event.model.Event;
@@ -25,14 +26,5 @@ public interface EventRepository extends PagingAndSortingRepository<Event, Long>
     Page<Event> findAllByInitiator(User u, Pageable pageable);
 
     Event findEventByInitiatorAndId(User u, Long eventId);
-
-    Page<Event> findEventsByAnnotationContainingIgnoreCaseOrDescriptionIgnoreCaseAndEventDateBetweenAndPaidAndCategoryIn(String annotation,
-                                                                                                                         String description,
-                                                                                                                         LocalDateTime start,
-                                                                                                                         LocalDateTime end,
-                                                                                                                         Boolean paid,
-                                                                                                                         Collection<Category> category,
-                                                                                                                         Pageable pageable);
-
 
 }

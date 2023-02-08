@@ -1,4 +1,4 @@
-package explorewithme.service;
+package ru.explorewithme.service;
 
 
 import ru.practicum.dtos.StatRequestDto;

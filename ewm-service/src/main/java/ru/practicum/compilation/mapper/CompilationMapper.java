@@ -18,9 +18,10 @@ public class CompilationMapper {
                 .build();
     }
 
-    public static void toCompilation(Compilation compilation, CompilationDtoRequest compilationDto) {
+    public static Compilation toCompilation(Compilation compilation, CompilationDtoRequest compilationDto) {
         if (compilationDto.getId() != null) compilation.setId(compilationDto.getId());
         if (compilationDto.getPinned() != null) compilation.setPinned(compilationDto.getPinned());
         if (compilationDto.getTitle() != null) compilation.setTitle(compilationDto.getTitle());
+        return compilation;
     }
 }

@@ -35,26 +35,27 @@ public class EventRequestServiceImpl implements EventRequestService {
             throw new ResourceNotFoundException(String.format("User with id=%d not found", userId));
         }
 
-        var event = eventRepository.findById(eventId);
-        if (event.isEmpty()) {
+        var eventOptional = eventRepository.findById(eventId);
+        if (eventOptional.isEmpty()) {
             throw new ResourceNotFoundException(String.format("event with id=%d not found", eventId));
         }
-        if (Objects.equals(event.get().getInitiator().getId(), userId)) {
+        var event = eventOptional.get();
+        if (Objects.equals(event.getInitiator().getId(), userId)) {
             throw new ConflictException("Incorrect StateAction");
         }
-        if (event.get().getState() != State.PUBLISHED) {
+        if (event.getState() != State.PUBLISHED) {
             throw new ConflictException("Incorrect StateAction");
         }
-        if (event.get().getParticipantLimit() == 0) {
+        if (event.getParticipantLimit() == 0) {
             throw new ConflictException("ParticipantLimit is 0");
         } else {
-            if (!event.get().getRequestModeration()) {
-                event.get().setParticipantLimit(event.get().getParticipantLimit() - 1);
-                eventRepository.save(event.get());
+            if (!event.getRequestModeration()) {
+                event.setParticipantLimit(event.getParticipantLimit() - 1);
+                eventRepository.save(event);
             }
         }
         eventRequest.setRequester(requester.get());
-        eventRequest.setEvent(event.get());
+        eventRequest.setEvent(event);
         eventRequest.setState(RequestStatus.PENDING);
         EventRequest createdCategory = repository.save(eventRequest);
         log.info("Category created" + createdCategory);
@@ -84,19 +85,20 @@ public class EventRequestServiceImpl implements EventRequestService {
             throw new ResourceNotFoundException(String.format("User with id=%d not found", userId));
         }
 
-        var event = eventRepository.findByInitiatorAndId(requester.get(), eventId);
-        if (event.isEmpty()) {
+        var eventOptional = eventRepository.findByInitiatorAndId(requester.get(), eventId);
+        if (eventOptional.isEmpty()) {
             throw new ResourceNotFoundException(String.format("event with id=%d not found", eventId));
         }
-        if (event.get().getParticipantLimit() == 0) {
+        var event = eventOptional.get();
+        if (event.getParticipantLimit() == 0) {
             throw new ConflictException("ParticipantLimit is 0");
         } else {
-            if (event.get().getRequestModeration()) {
-                event.get().setParticipantLimit(event.get().getParticipantLimit() - (long) eventRequestStatusUpdateRequest.getRequestIds().size());
-                eventRepository.save(event.get());
+            if (event.getRequestModeration()) {
+                event.setParticipantLimit(event.getParticipantLimit() - (long) eventRequestStatusUpdateRequest.getRequestIds().size());
+                eventRepository.save(event);
             }
         }
-        var res = repository.findEventRequestsByIdInAndEventIs(eventRequestStatusUpdateRequest.getRequestIds(), event.get());
+        var res = repository.findEventRequestsByIdInAndEventIs(eventRequestStatusUpdateRequest.getRequestIds(), event);
         if (res.size() == 0) {
             return eventRequestListDto;
         }
@@ -106,12 +108,12 @@ public class EventRequestServiceImpl implements EventRequestService {
         });
 
         if (eventRequestStatusUpdateRequest.getStatus() == RequestStatus.REJECTED) {
-            eventRequestListDto.setRejectedRequests(repository.findEventRequestsByIdInAndEventIs(eventRequestStatusUpdateRequest.getRequestIds(), event.get())
+            eventRequestListDto.setRejectedRequests(repository.findEventRequestsByIdInAndEventIs(eventRequestStatusUpdateRequest.getRequestIds(), event)
                     .stream()
                     .map(EventRequestMapper::toEventRequestDto)
                     .collect(Collectors.toList()));
         } else {
-            eventRequestListDto.setConfirmedRequests(repository.findEventRequestsByIdInAndEventIs(eventRequestStatusUpdateRequest.getRequestIds(), event.get())
+            eventRequestListDto.setConfirmedRequests(repository.findEventRequestsByIdInAndEventIs(eventRequestStatusUpdateRequest.getRequestIds(), event)
                     .stream()
                     .map(EventRequestMapper::toEventRequestDto)
                     .collect(Collectors.toList()));

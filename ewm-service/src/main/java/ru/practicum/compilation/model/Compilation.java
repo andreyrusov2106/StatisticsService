@@ -1,16 +1,15 @@
 package ru.practicum.compilation.model;
 
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import ru.practicum.event.model.Event;
 
 import javax.persistence.*;
 import java.util.List;
 
 
-@Data
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
@@ -22,8 +21,6 @@ public class Compilation {
     private Long id;
     @OneToMany
     private List<Event> events;
-    @Column(name = "pinned")
     private Boolean pinned;
-    @Column(name = "title")
     private String title;
 }

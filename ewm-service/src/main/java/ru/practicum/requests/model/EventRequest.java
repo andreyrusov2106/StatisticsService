@@ -1,9 +1,7 @@
 package ru.practicum.requests.model;
 
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import ru.practicum.event.model.Event;
 import ru.practicum.requests.dto.RequestStatus;
 import ru.practicum.user.model.User;
@@ -12,7 +10,8 @@ import javax.persistence.*;
 import java.time.LocalDateTime;
 
 
-@Data
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
@@ -27,9 +26,7 @@ public class EventRequest {
     @OneToOne
     private Event event;
     @Enumerated(EnumType.STRING)
-    @Column(name = "state")
     private RequestStatus state;
-    @Column(name = "created")
     private LocalDateTime created;
 
 }

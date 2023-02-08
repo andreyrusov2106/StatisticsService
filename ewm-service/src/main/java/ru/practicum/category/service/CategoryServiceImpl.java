@@ -23,8 +23,7 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public CategoryDto createCategoryAdmin(CategoryDto categoryDto) {
-        Category category = new Category();
-        CategoryMapper.toCategory(category, categoryDto);
+        Category category = CategoryMapper.toCategory(new Category(), categoryDto);
         Category createdCategory = repository.save(category);
         log.info("Category created" + createdCategory);
         return CategoryMapper.toCategoryDto(createdCategory);
@@ -33,15 +32,16 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public CategoryDto updateCategoryAdmin(Long id, CategoryDto categoryDto) {
         Category updatedCategory;
-        var category = repository.findById(id);
-        if (category.isPresent()) {
-            CategoryMapper.toCategory(category.get(), categoryDto);
-            category.get().setId(id);
-            updatedCategory = repository.save(category.get());
+        var categoryOptional = repository.findById(id);
+        if (categoryOptional.isPresent()) {
+            var category = categoryOptional.get();
+            CategoryMapper.toCategory(category, categoryDto);
+            category.setId(id);
+            updatedCategory = repository.save(category);
             log.info("Category updated" + updatedCategory);
             return CategoryMapper.toCategoryDto(updatedCategory);
         } else {
-            throw new ResourceNotFoundException("Category not found");
+            throw new ResourceNotFoundException(String.format("Category with id=%d not found",id));
         }
     }
 
@@ -68,7 +68,7 @@ public class CategoryServiceImpl implements CategoryService {
     public CategoryDto getCategoryPublic(Long id) {
         var category = repository.findById(id);
         if (category.isEmpty()) {
-            throw new ResourceNotFoundException("Category not found");
+            throw new ResourceNotFoundException(String.format("Category with id=%d not found",id));
         }
         return CategoryMapper.toCategoryDto(category.get());
     }

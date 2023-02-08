@@ -22,9 +22,9 @@ public class EventControllerAdmin {
     }
 
     @GetMapping()
-    public List<EventDtoResponse> findAll(@RequestParam(name = "text", required = false) Long[] userIds,
-                                          @RequestParam(name = "states", required = false) String[] states,
-                                          @RequestParam(name = "categories", required = false) Long[] categories,
+    public List<EventDtoResponse> findAll(@RequestParam(name = "text", required = false) List<Long> userIds,
+                                          @RequestParam(name = "states", required = false) List<String> states,
+                                          @RequestParam(name = "categories", required = false) List<Long> categories,
                                           @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime rangeStart,
                                           @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime rangeEnd,
                                           @RequestParam(name = "from", required = false, defaultValue = "0") Integer from,
