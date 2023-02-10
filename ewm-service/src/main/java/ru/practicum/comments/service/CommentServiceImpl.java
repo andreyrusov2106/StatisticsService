@@ -87,7 +87,7 @@ public class CommentServiceImpl implements CommentService {
             throw new ResourceNotFoundException(String.format("Comment with id=%d not found", commentId));
         }
         var comment = commentOptional.get();
-
+        event.get().getComments().remove(comment);
         commentRepository.delete(comment);
         log.info(String.format("Comment with id=%d deleted", commentId));
     }

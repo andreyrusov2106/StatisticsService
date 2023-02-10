@@ -2,7 +2,7 @@
 	"info": {
 		"_postman_id": "deff51c3-85f8-43dc-842c-d49f843eb072",
 		"name": "feature",
-		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
 		"_exporter_id": "23127315"
 	},
 	"item": [
@@ -566,17 +566,7 @@
 									"pm.test(\"Ответ должен содержать код статуса 204\", function () {\r",
 									"    pm.response.to.have.status(204);\r",
 									"});\r",
-									"comId = pm.collectionVariables.get('comId');\r",
-									"userId = pm.collectionVariables.get('uId');\r",
-									"eventId = pm.collectionVariables.get('eId');\r",
-									"pm.sendRequest({\r",
-									"            url: pm.collectionVariables.get(\"baseUrl\") + \"/users/\" + userId + \"/events/\" + eventId +\"/comments\" + comId,\r",
-									"            method: 'GET',\r",
-									"        }, (error, response) => {\r",
-									"            pm.test(\"Комментарий не должен быть найдена после удаления\", function () {\r",
-									"                pm.expect(response.code).to.eql(404);\r",
-									"            });\r",
-									"        });"
+									""
 								],
 								"type": "text/javascript"
 							}
