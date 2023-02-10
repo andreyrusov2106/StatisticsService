@@ -100,7 +100,7 @@ public class EventServiceImpl implements EventService {
                 throw new ResourceNotFoundException("Initiator is not correct");
             }
         } else {
-            throw new ResourceNotFoundException(String.format("Event with id=%d not found",eventId));
+            throw new ResourceNotFoundException(String.format("Event with id=%d not found", eventId));
         }
     }
 
@@ -239,7 +239,7 @@ public class EventServiceImpl implements EventService {
             log.info("Event updated" + updatedEvent);
             return EventMapper.toEventDto(updatedEvent);
         } else {
-            throw new ResourceNotFoundException(String.format("Event with id=%d not found",eventId));
+            throw new ResourceNotFoundException(String.format("Event with id=%d not found", eventId));
         }
     }
 
@@ -253,7 +253,7 @@ public class EventServiceImpl implements EventService {
         client.createStatistic(statRequestDto);
         var user = eventRepository.findById(id);
         if (user.isEmpty()) {
-            throw new ResourceNotFoundException(String.format("User with id=%d not found",id));
+            throw new ResourceNotFoundException(String.format("User with id=%d not found", id));
         }
         return EventMapper.toEventDto(user.get());
     }

@@ -5,9 +5,11 @@ import lombok.*;
 import lombok.experimental.NonFinal;
 import org.springframework.format.annotation.DateTimeFormat;
 import ru.practicum.category.model.Category;
+import ru.practicum.comments.model.Comment;
 import ru.practicum.user.model.User;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -36,4 +38,6 @@ public class EventDtoShortResponse {
     String title;
     @NonFinal
     Long views;
+    @NonFinal
+    List<Comment> comments;
 }

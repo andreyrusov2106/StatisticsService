@@ -3,6 +3,8 @@ package ru.practicum.event.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import ru.practicum.comments.dto.CommentDtoResponse;
+import ru.practicum.comments.service.CommentService;
 import ru.practicum.event.dto.EventDtoRequest;
 import ru.practicum.event.dto.EventDtoResponse;
 import ru.practicum.event.dto.EventDtoShortResponse;
@@ -17,10 +19,12 @@ import java.util.List;
 @RequestMapping(path = "/users")
 public class EventControllerPrivate {
     private final EventService eventService;
+    private final CommentService commentService;
 
     @Autowired
-    public EventControllerPrivate(EventService eventService) {
+    public EventControllerPrivate(EventService eventService, CommentService commentService) {
         this.eventService = eventService;
+        this.commentService = commentService;
     }
 
     @GetMapping("/{userId}/events")
@@ -55,6 +59,31 @@ public class EventControllerPrivate {
     public List<EventRequestDto> findAllRequests(@PathVariable Long userId,
                                                  @PathVariable Long eventId) {
         return eventService.getEventRequestsPrivate(userId, eventId);
+    }
+
+    @ResponseStatus(HttpStatus.CREATED)
+    @PostMapping("/{userId}/events/{eventId}/comments")
+    public CommentDtoResponse createCommentPrivate(@Valid @RequestBody CommentDtoResponse commentDtoResponse,
+                                                   @PathVariable Long userId,
+                                                   @PathVariable Long eventId) {
+        return commentService.createComment(commentDtoResponse, userId, eventId);
+    }
+
+
+    @PatchMapping("/{userId}/events/{eventId}/comments/{commentId}")
+    public CommentDtoResponse updateCommentPrivate(@Valid @RequestBody CommentDtoResponse commentDtoResponse,
+                                                   @PathVariable Long userId,
+                                                   @PathVariable Long eventId,
+                                                   @PathVariable Long commentId) {
+        return commentService.updateComment(commentDtoResponse, userId, eventId, commentId);
+    }
+
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @DeleteMapping("/{userId}/events/{eventId}/comments/{commentId}")
+    public void deleteCommentPrivate(@PathVariable Long userId,
+                                     @PathVariable Long eventId,
+                                     @PathVariable Long commentId) {
+        commentService.deleteComment(userId, eventId, commentId);
     }
 
 

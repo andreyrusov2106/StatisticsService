@@ -5,6 +5,7 @@ DROP table IF EXISTS PUBLIC.locations cascade;
 DROP table IF EXISTS PUBLIC.compilations cascade;
 DROP table IF EXISTS PUBLIC.event_requests cascade;
 DROP table IF EXISTS PUBLIC.compilations_events cascade;
+DROP table IF EXISTS PUBLIC.comments cascade;
 
 CREATE TABLE IF NOT EXISTS PUBLIC.users (
     id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
@@ -65,6 +66,20 @@ CREATE TABLE IF NOT EXISTS PUBLIC.event_requests (
     CONSTRAINT fk_event_requests_to_users FOREIGN KEY(requester_id) REFERENCES users(id),
     CONSTRAINT fk_event_requests_to_events FOREIGN KEY(event_id) REFERENCES events(id),
     constraint event_request_pk primary key (event_id, requester_id)
+    );
+
+CREATE TABLE IF NOT EXISTS comments (
+    id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    text varchar(3000),
+    author_id BIGINT,
+    created_on TIMESTAMP WITHOUT TIME ZONE,
+    CONSTRAINT fk_comments_to_users FOREIGN KEY(author_id) REFERENCES users(id));
+
+CREATE TABLE IF NOT EXISTS events_comments(
+    event_id BIGINT not null,
+    comments_id BIGINT not null,
+    CONSTRAINT fk_compilation_events_to_comments FOREIGN KEY(event_id) REFERENCES events(id),
+    CONSTRAINT fk_compilation_comments_to_events FOREIGN KEY(comments_id) REFERENCES comments(id)
     );
 
 
