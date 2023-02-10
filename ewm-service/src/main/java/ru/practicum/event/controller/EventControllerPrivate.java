@@ -3,6 +3,7 @@ package ru.practicum.event.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import ru.practicum.comments.dto.CommentDtoRequest;
 import ru.practicum.comments.dto.CommentDtoResponse;
 import ru.practicum.comments.service.CommentService;
 import ru.practicum.event.dto.EventDtoRequest;
@@ -63,19 +64,19 @@ public class EventControllerPrivate {
 
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("/{userId}/events/{eventId}/comments")
-    public CommentDtoResponse createCommentPrivate(@Valid @RequestBody CommentDtoResponse commentDtoResponse,
+    public CommentDtoResponse createCommentPrivate(@Valid @RequestBody CommentDtoRequest commentDtoRequest,
                                                    @PathVariable Long userId,
                                                    @PathVariable Long eventId) {
-        return commentService.createComment(commentDtoResponse, userId, eventId);
+        return commentService.createComment(commentDtoRequest, userId, eventId);
     }
 
 
     @PatchMapping("/{userId}/events/{eventId}/comments/{commentId}")
-    public CommentDtoResponse updateCommentPrivate(@Valid @RequestBody CommentDtoResponse commentDtoResponse,
+    public CommentDtoResponse updateCommentPrivate(@Valid @RequestBody CommentDtoRequest commentDtoRequest,
                                                    @PathVariable Long userId,
                                                    @PathVariable Long eventId,
                                                    @PathVariable Long commentId) {
-        return commentService.updateComment(commentDtoResponse, userId, eventId, commentId);
+        return commentService.updateComment(commentDtoRequest, userId, eventId, commentId);
     }
 
     @ResponseStatus(HttpStatus.NO_CONTENT)

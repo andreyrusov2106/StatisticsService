@@ -3,6 +3,7 @@ package ru.practicum.comments.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import ru.practicum.comments.dto.CommentDtoRequest;
 import ru.practicum.comments.dto.CommentDtoResponse;
 import ru.practicum.comments.mapper.CommentMapper;
 import ru.practicum.comments.model.Comment;
@@ -25,8 +26,8 @@ public class CommentServiceImpl implements CommentService {
 
 
     @Override
-    public CommentDtoResponse createComment(CommentDtoResponse commentDtoResponse, Long userId, Long itemId) {
-        Comment newComment = CommentMapper.toComment(new Comment(), commentDtoResponse);
+    public CommentDtoResponse createComment(CommentDtoRequest commentDtoRequest, Long userId, Long itemId) {
+        Comment newComment = CommentMapper.toComment(new Comment(), commentDtoRequest);
         newComment.setCreatedOn(LocalDateTime.now());
         var owner = userRepository.findById(userId);
         if (owner.isEmpty()) {
@@ -47,7 +48,7 @@ public class CommentServiceImpl implements CommentService {
 
 
     @Override
-    public CommentDtoResponse updateComment(CommentDtoResponse commentDtoResponse, Long userId, Long itemId, Long commentId) {
+    public CommentDtoResponse updateComment(CommentDtoRequest commentDtoRequest, Long userId, Long itemId, Long commentId) {
         var owner = userRepository.findById(userId);
         if (owner.isEmpty()) {
             throw new ResourceNotFoundException(String.format("User with id=%d not found", userId));
@@ -62,7 +63,7 @@ public class CommentServiceImpl implements CommentService {
             throw new ResourceNotFoundException(String.format("Comment with id=%d not found", userId));
         }
         var comment = commentOptional.get();
-        CommentMapper.toComment(comment, commentDtoResponse);
+        CommentMapper.toComment(comment, commentDtoRequest);
 
         Comment updatedComment = commentRepository.save(comment);
         log.info("Comment created" + updatedComment);
