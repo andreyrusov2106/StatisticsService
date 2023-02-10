@@ -6,6 +6,7 @@ DROP table IF EXISTS PUBLIC.compilations cascade;
 DROP table IF EXISTS PUBLIC.event_requests cascade;
 DROP table IF EXISTS PUBLIC.compilations_events cascade;
 DROP table IF EXISTS PUBLIC.comments cascade;
+DROP table IF EXISTS PUBLIC.events_commentsc ascade;
 
 CREATE TABLE IF NOT EXISTS PUBLIC.users (
     id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
