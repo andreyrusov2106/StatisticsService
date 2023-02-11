@@ -10,7 +10,6 @@ import ru.practicum.user.mapper.UserMapper;
 import ru.practicum.user.model.User;
 import ru.practicum.user.repository.UserRepository;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -31,17 +30,13 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDto updateUser(Long id, UserDto userDto) {
         User updatedUser;
-        var userOptional = repository.findById(id);
-        if (userOptional.isPresent()) {
-            var user = userOptional.get();
-            UserMapper.toUser(user, userDto);
-            user.setId(id);
-            updatedUser = repository.save(user);
-            log.info("User updated" + updatedUser);
-            return UserMapper.toUserDto(updatedUser);
-        } else {
-            throw new ResourceNotFoundException(String.format("User with id=%d not found", id));
-        }
+        var user = repository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException(String.format("User with id=%d not found", id)));
+        UserMapper.toUser(user, userDto);
+        user.setId(id);
+        updatedUser = repository.save(user);
+        log.info("User updated" + updatedUser);
+        return UserMapper.toUserDto(updatedUser);
     }
 
     @Override
@@ -60,16 +55,14 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDto getUser(Long id) {
-        var user = repository.findById(id);
-        if (user.isEmpty()) {
-            throw new ResourceNotFoundException(String.format("User with id=%d not found", id));
-        }
-        return UserMapper.toUserDto(user.get());
+        var user = repository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException(String.format("User with id=%d not found", id)));
+        return UserMapper.toUserDto(user);
     }
 
     @Override
     public void removeUser(Long id) {
-        repository.deleteAllById(Collections.singleton(id));
+        repository.deleteById(id);
     }
 
     private Pageable sizeAndFromToPageable(Integer from, Integer size) {

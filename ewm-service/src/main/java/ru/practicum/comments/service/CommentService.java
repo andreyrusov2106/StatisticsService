@@ -8,7 +8,7 @@ public interface CommentService {
 
     CommentDtoResponse createComment(CommentDtoRequest commentDtoRequest, Long userId, Long eventId);
 
-    CommentDtoResponse updateComment(CommentDtoRequest commentDtoRequest, Long userId, Long eventId, Long commentId);
+    CommentDtoResponse updateComment(CommentDtoRequest commentDtoRequest, Long commentId);
 
-    void deleteComment(Long userId, Long eventId, Long commentId);
+    void deleteComment(Long commentId);
 }

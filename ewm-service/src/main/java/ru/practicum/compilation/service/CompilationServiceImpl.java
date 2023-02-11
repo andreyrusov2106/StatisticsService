@@ -13,7 +13,6 @@ import ru.practicum.compilation.repository.CompilationRepository;
 import ru.practicum.event.repository.EventRepository;
 import ru.practicum.exceptions.ResourceNotFoundException;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -37,21 +36,16 @@ public class CompilationServiceImpl implements CompilationService {
 
     @Override
     public CompilationDtoResponse updateCompilationAdmin(Long id, CompilationDtoRequest categoryDto) {
-        Compilation updatedCategory;
-        var compilationOptional = repository.findById(id);
-        if (compilationOptional.isPresent()) {
-            var compilation = compilationOptional.get();
-            CompilationMapper.toCompilation(compilation, categoryDto);
-            compilation.setId(id);
-            if (categoryDto.getEvents() != null) {
-                compilation.setEvents(eventRepository.findAllByIdIn(categoryDto.getEvents()));
-            }
-            updatedCategory = repository.save(compilation);
-            log.info("Category updated" + updatedCategory);
-            return CompilationMapper.toCompilationDto(updatedCategory);
-        } else {
-            throw new ResourceNotFoundException(String.format("Compilation with id=%d not found",id));
+        var compilation = repository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException(String.format("compilation with id=%d not found", id)));
+        CompilationMapper.toCompilation(compilation, categoryDto);
+        compilation.setId(id);
+        if (categoryDto.getEvents() != null) {
+            compilation.setEvents(eventRepository.findAllByIdIn(categoryDto.getEvents()));
         }
+        Compilation updatedCompilation = repository.save(compilation);
+        log.info("Category updated" + updatedCompilation);
+        return CompilationMapper.toCompilationDto(updatedCompilation);
     }
 
     @Override
@@ -78,7 +72,7 @@ public class CompilationServiceImpl implements CompilationService {
 
     @Override
     public void removeCompilation(Long id) {
-        repository.deleteAllById(Collections.singleton(id));
+        repository.deleteById(id);
     }
 
     private Pageable sizeAndFromToPageable(Integer from, Integer size) {

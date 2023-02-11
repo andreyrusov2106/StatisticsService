@@ -406,8 +406,6 @@
 									"        const category = await api.addCategory(rnd.getCategory());\r",
 									"        const event = await api.addEvent(user.id, rnd.getEvent(category.id));\r",
 									"\t\tconst comment = await api.addComment(user.id, event.id, rnd.getComment(user, event.id));\r",
-									"        pm.collectionVariables.set(\"uid\", user.id);\r",
-									"        pm.collectionVariables.set(\"eid\", event.id);\r",
 									"\t\tpm.collectionVariables.set(\"comid\", comment.id);\r",
 									"        pm.request.body.update({\r",
 									"            mode: 'raw',\r",
@@ -487,27 +485,16 @@
 							"raw": "{{request_body}}"
 						},
 						"url": {
-							"raw": "{{baseUrl}}/users/:userId/events/:eventId/comments/:commentId",
+							"raw": "{{baseUrl}}/users/comments/:commentId",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
 								"users",
-								":userId",
-								"events",
-								":eventId",
 								"comments",
 								":commentId"
 							],
 							"variable": [
-								{
-									"key": "userId",
-									"value": "{{uid}}"
-								},
-								{
-									"key": "eventId",
-									"value": "{{eid}}"
-								},
 								{
 									"key": "commentId",
 									"value": "{{comid}}"
@@ -533,8 +520,6 @@
 									"        const category = await api.addCategory(rnd.getCategory());\r",
 									"        const event = await api.addEvent(user.id, rnd.getEvent(category.id));\r",
 									"\t\tconst comment = await api.addComment(user.id, event.id, rnd.getComment(user, event.id));\r",
-									"        pm.collectionVariables.set(\"uid\", user.id);\r",
-									"        pm.collectionVariables.set(\"eid\", event.id);\r",
 									"\t\tpm.collectionVariables.set(\"comid\", comment.id);\r",
 									"    } catch(err) {\r",
 									"        console.error(\"Ошибка при подготовке тестовых данных.\", err);\r",
@@ -587,27 +572,16 @@
 							}
 						],
 						"url": {
-							"raw": "{{baseUrl}}/users/:userId/events/:eventId/comments/:commentId",
+							"raw": "{{baseUrl}}/users/comments/:commentId",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
 								"users",
-								":userId",
-								"events",
-								":eventId",
 								"comments",
 								":commentId"
 							],
 							"variable": [
-								{
-									"key": "userId",
-									"value": "{{uid}}"
-								},
-								{
-									"key": "eventId",
-									"value": "{{eid}}"
-								},
 								{
 									"key": "commentId",
 									"value": "{{comid}}"

@@ -19,7 +19,7 @@ public class Comment {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String text;
-    @OneToOne()
+    @OneToOne
     private User author;
     private LocalDateTime createdOn;
 }

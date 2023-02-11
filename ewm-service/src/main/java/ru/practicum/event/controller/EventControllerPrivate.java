@@ -69,23 +69,4 @@ public class EventControllerPrivate {
                                                    @PathVariable Long eventId) {
         return commentService.createComment(commentDtoRequest, userId, eventId);
     }
-
-
-    @PatchMapping("/{userId}/events/{eventId}/comments/{commentId}")
-    public CommentDtoResponse updateCommentPrivate(@Valid @RequestBody CommentDtoRequest commentDtoRequest,
-                                                   @PathVariable Long userId,
-                                                   @PathVariable Long eventId,
-                                                   @PathVariable Long commentId) {
-        return commentService.updateComment(commentDtoRequest, userId, eventId, commentId);
-    }
-
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    @DeleteMapping("/{userId}/events/{eventId}/comments/{commentId}")
-    public void deleteCommentPrivate(@PathVariable Long userId,
-                                     @PathVariable Long eventId,
-                                     @PathVariable Long commentId) {
-        commentService.deleteComment(userId, eventId, commentId);
-    }
-
-
 }

@@ -43,7 +43,7 @@ public class Event {
     private User initiator;
     @OneToOne
     private Location location;
-    @OneToMany(fetch = FetchType.EAGER)
+    @OneToMany
     private List<Comment> comments;
 
     public void addComment(Comment comment) {

@@ -79,8 +79,8 @@ CREATE TABLE IF NOT EXISTS comments (
 CREATE TABLE IF NOT EXISTS events_comments(
     event_id BIGINT not null,
     comments_id BIGINT not null,
-    CONSTRAINT fk_compilation_events_to_comments FOREIGN KEY(event_id) REFERENCES events(id),
-    CONSTRAINT fk_compilation_comments_to_events FOREIGN KEY(comments_id) REFERENCES comments(id)
+    CONSTRAINT fk_compilation_events_to_comments FOREIGN KEY(event_id) REFERENCES events(id) ,
+    CONSTRAINT fk_compilation_comments_to_events FOREIGN KEY(comments_id) REFERENCES comments(id) ON DELETE CASCADE
     );
 
 
