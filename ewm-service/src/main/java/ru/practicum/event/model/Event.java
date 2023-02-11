@@ -3,10 +3,12 @@ package ru.practicum.event.model;
 
 import lombok.*;
 import ru.practicum.category.model.Category;
+import ru.practicum.comments.model.Comment;
 import ru.practicum.user.model.User;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.List;
 
 
 @Getter
@@ -41,4 +43,10 @@ public class Event {
     private User initiator;
     @OneToOne
     private Location location;
+    @OneToMany
+    private List<Comment> comments;
+
+    public void addComment(Comment comment) {
+        comments.add(comment);
+    }
 }

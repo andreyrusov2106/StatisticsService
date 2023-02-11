@@ -11,7 +11,6 @@ import ru.practicum.category.model.Category;
 import ru.practicum.category.repository.CategoryRepository;
 import ru.practicum.exceptions.ResourceNotFoundException;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -32,17 +31,13 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public CategoryDto updateCategoryAdmin(Long id, CategoryDto categoryDto) {
         Category updatedCategory;
-        var categoryOptional = repository.findById(id);
-        if (categoryOptional.isPresent()) {
-            var category = categoryOptional.get();
-            CategoryMapper.toCategory(category, categoryDto);
-            category.setId(id);
-            updatedCategory = repository.save(category);
-            log.info("Category updated" + updatedCategory);
-            return CategoryMapper.toCategoryDto(updatedCategory);
-        } else {
-            throw new ResourceNotFoundException(String.format("Category with id=%d not found",id));
-        }
+        var category = repository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException(String.format("category with id=%d not found", id)));
+        CategoryMapper.toCategory(category, categoryDto);
+        category.setId(id);
+        updatedCategory = repository.save(category);
+        log.info("Category updated" + updatedCategory);
+        return CategoryMapper.toCategoryDto(updatedCategory);
     }
 
     @Override
@@ -66,16 +61,14 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public CategoryDto getCategoryPublic(Long id) {
-        var category = repository.findById(id);
-        if (category.isEmpty()) {
-            throw new ResourceNotFoundException(String.format("Category with id=%d not found",id));
-        }
-        return CategoryMapper.toCategoryDto(category.get());
+        var category = repository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException(String.format("category with id=%d not found", id)));
+        return CategoryMapper.toCategoryDto(category);
     }
 
     @Override
     public void removeCategoryAdmin(Long id) {
-        repository.deleteAllById(Collections.singleton(id));
+        repository.deleteById(id);
     }
 
     private Pageable sizeAndFromToPageable(Integer from, Integer size) {

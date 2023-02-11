@@ -30,18 +30,13 @@ public class EventRequestServiceImpl implements EventRequestService {
     public EventRequestDto createEventRequest(Long userId, Long eventId) {
         EventRequest eventRequest = new EventRequest();
         eventRequest.setCreated(LocalDateTime.now().withNano(0));
-        var requester = userRepository.findById(userId);
-        if (requester.isEmpty()) {
-            throw new ResourceNotFoundException(String.format("User with id=%d not found", userId));
-        }
+        var requester = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException(String.format("User with id=%d not found", userId)));
 
-        var eventOptional = eventRepository.findById(eventId);
-        if (eventOptional.isEmpty()) {
-            throw new ResourceNotFoundException(String.format("event with id=%d not found", eventId));
-        }
-        var event = eventOptional.get();
+        var event = eventRepository.findById(eventId)
+                .orElseThrow(() -> new ResourceNotFoundException(String.format("Event with id=%d not found", eventId)));
         if (Objects.equals(event.getInitiator().getId(), userId)) {
-            throw new ConflictException("Incorrect StateAction");
+            throw new ConflictException("Incorrect initiator");
         }
         if (event.getState() != State.PUBLISHED) {
             throw new ConflictException("Incorrect StateAction");
@@ -54,7 +49,7 @@ public class EventRequestServiceImpl implements EventRequestService {
                 eventRepository.save(event);
             }
         }
-        eventRequest.setRequester(requester.get());
+        eventRequest.setRequester(requester);
         eventRequest.setEvent(event);
         eventRequest.setState(RequestStatus.PENDING);
         EventRequest createdCategory = repository.save(eventRequest);
@@ -64,11 +59,9 @@ public class EventRequestServiceImpl implements EventRequestService {
 
     @Override
     public EventRequestDto updateCategory(Long userId, Long requestId) {
-        var requester = userRepository.findById(userId);
-        if (requester.isEmpty()) {
-            throw new ResourceNotFoundException(String.format("User with id=%d not found", userId));
-        }
-        var res = repository.findAEventRequestByIdIsAndRequesterIs(requestId, requester.get());
+        var requester = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException(String.format("User with id=%d not found", userId)));
+        var res = repository.findAEventRequestByIdIsAndRequesterIs(requestId, requester);
         res.setState(RequestStatus.CANCELED);
         var updated = repository.save(res);
         return EventRequestMapper.toEventRequestDto(updated);
@@ -80,16 +73,11 @@ public class EventRequestServiceImpl implements EventRequestService {
                                                         Long eventId,
                                                         EventRequestStatusUpdateRequest eventRequestStatusUpdateRequest) {
         EventRequestListDto eventRequestListDto = new EventRequestListDto();
-        var requester = userRepository.findById(userId);
-        if (requester.isEmpty()) {
-            throw new ResourceNotFoundException(String.format("User with id=%d not found", userId));
-        }
+        var requester = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException(String.format("User with id=%d not found", userId)));
 
-        var eventOptional = eventRepository.findByInitiatorAndId(requester.get(), eventId);
-        if (eventOptional.isEmpty()) {
-            throw new ResourceNotFoundException(String.format("event with id=%d not found", eventId));
-        }
-        var event = eventOptional.get();
+        var event = eventRepository.findByInitiatorAndId(requester, eventId)
+                .orElseThrow(() -> new ResourceNotFoundException(String.format("Event with id=%d not found", eventId)));
         if (event.getParticipantLimit() == 0) {
             throw new ConflictException("ParticipantLimit is 0");
         } else {
@@ -119,21 +107,15 @@ public class EventRequestServiceImpl implements EventRequestService {
                     .collect(Collectors.toList()));
         }
         return eventRequestListDto;
-
     }
 
     @Override
     public List<EventRequestDto> getAllEventRequest(Long userId) {
-        var requester = userRepository.findById(userId);
-        if (requester.isEmpty()) {
-            throw new ResourceNotFoundException(String.format("User with id=%d not found", userId));
-        } else {
-            return repository.findEventRequestsByRequester(requester.get())
-                    .stream()
-                    .map(EventRequestMapper::toEventRequestDto)
-                    .collect(Collectors.toList());
-        }
-
+        var requester = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException(String.format("User with id=%d not found", userId)));
+        return repository.findEventRequestsByRequester(requester)
+                .stream()
+                .map(EventRequestMapper::toEventRequestDto)
+                .collect(Collectors.toList());
     }
-
 }

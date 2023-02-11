@@ -57,12 +57,9 @@ public class EventServiceImpl implements EventService {
         Event event = EventMapper.toEvent(new Event(), eventDto);
         event.setState(State.PENDING);
         event.setCreatedOn(LocalDateTime.now().withNano(0));
-        var initiator = userRepository.findById(userId);
-        if (initiator.isEmpty()) {
-            throw new ResourceNotFoundException(String.format("User with id=%d not found", userId));
-        } else {
-            event.setInitiator(initiator.get());
-        }
+        var initiator = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException(String.format("User with id=%d not found", userId)));
+        event.setInitiator(initiator);
         if (event.getLocation() != null) {
             Location createdLocation = locationRepository.save(eventDto.getLocation());
             event.setLocation(createdLocation);
@@ -81,26 +78,22 @@ public class EventServiceImpl implements EventService {
         if (eventDto.getEventDate() != null && eventDto.getEventDate().isBefore(LocalDateTime.now().plusHours(2))) {
             throw new ConflictException("Incorrect event date");
         }
-        var eventOptional = eventRepository.findById(eventId);
-        if (eventOptional.isPresent()) {
-            var event = eventOptional.get();
-            if (event.getInitiator().getId().equals(userId)) {
-                if (event.getState() == State.PUBLISHED) {
-                    throw new ConflictException("Can not be changed");
-                }
-                EventMapper.toEvent(event, eventDto);
-                if (eventDto.getStateAction() != null) {
-                    event.setState(StateAction.stringToState(eventDto.getStateAction()));
-                }
-                event.setId(eventId);
-                updatedEvent = eventRepository.save(event);
-                log.info("Event updated" + updatedEvent);
-                return EventMapper.toEventDto(updatedEvent);
-            } else {
-                throw new ResourceNotFoundException("Initiator is not correct");
+        var event = eventRepository.findById(eventId)
+                .orElseThrow(() -> new ResourceNotFoundException(String.format("event with id=%d not found", eventId)));
+        if (event.getInitiator().getId().equals(userId)) {
+            if (event.getState() == State.PUBLISHED) {
+                throw new ConflictException("Can not be changed");
             }
+            EventMapper.toEvent(event, eventDto);
+            if (eventDto.getStateAction() != null) {
+                event.setState(StateAction.stringToState(eventDto.getStateAction()));
+            }
+            event.setId(eventId);
+            updatedEvent = eventRepository.save(event);
+            log.info("Event updated" + updatedEvent);
+            return EventMapper.toEventDto(updatedEvent);
         } else {
-            throw new ResourceNotFoundException(String.format("Event with id=%d not found",eventId));
+            throw new ResourceNotFoundException("Initiator is not correct");
         }
     }
 
@@ -166,38 +159,30 @@ public class EventServiceImpl implements EventService {
     @Override
     public List<EventDtoShortResponse> getAllEventsPrivate(Long userId, Integer from, Integer size) {
         Pageable pageable = sizeAndFromToPageable(from, size);
-        var initiator = userRepository.findById(userId);
-        if (initiator.isEmpty()) {
-            throw new ResourceNotFoundException(String.format("User with id=%d not found", userId));
-        } else {
-            return eventRepository.findAllByInitiator(initiator.get(), pageable)
-                    .stream()
-                    .map(EventMapper::toEventShortDto)
-                    .collect(Collectors.toList());
-        }
+        var initiator = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException(String.format("User with id=%d not found", userId)));
+        return eventRepository.findAllByInitiator(initiator, pageable)
+                .stream()
+                .map(EventMapper::toEventShortDto)
+                .collect(Collectors.toList());
     }
 
     @Override
     public EventDtoResponse getEventPrivate(Long userId, Long eventId) {
-        var initiator = userRepository.findById(userId);
-        if (initiator.isEmpty()) {
-            throw new ResourceNotFoundException(String.format("User with id=%d not found", userId));
-        } else {
-            return EventMapper.toEventDto(eventRepository.findEventByInitiatorAndId(initiator.get(), eventId));
-        }
+        var initiator = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException(String.format("User with id=%d not found", userId)));
+        return EventMapper.toEventDto(eventRepository.findEventByInitiatorAndId(initiator, eventId));
     }
 
     @Override
     public List<EventRequestDto> getEventRequestsPrivate(Long userId, Long eventId) {
-        var initiator = userRepository.findById(userId);
-        if (initiator.isEmpty()) {
-            throw new ResourceNotFoundException(String.format("User with id=%d not found", userId));
-        }
-        var event = eventRepository.findByInitiatorAndId(initiator.get(), eventId);
-        if (event.isEmpty()) {
-            throw new ResourceNotFoundException(String.format("Event with id=%d not found", userId));
-        }
-        return eventRequestRepository.findAllEventRequestsByEventIs(event.get())
+        var initiator = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException(String.format("User with id=%d not found", userId)));
+
+        var event = eventRepository.findByInitiatorAndId(initiator, eventId)
+                .orElseThrow(() -> new ResourceNotFoundException(String.format("event with id=%d not found", eventId)));
+
+        return eventRequestRepository.findAllEventRequestsByEventIs(event)
                 .stream().map(EventRequestMapper::toEventRequestDto)
                 .collect(Collectors.toList());
     }
@@ -209,38 +194,35 @@ public class EventServiceImpl implements EventService {
             throw new ConflictException("EventDate has to be after now +1Hour");
         }
 
-        var eventOptional = eventRepository.findById(eventId);
-        if (eventOptional.isPresent()) {
-            var event = eventOptional.get();
-            if (eventDtoRequest.getStateAction() != null) {
-                if (StateAction.stringToState(eventDtoRequest.getStateAction()) == event.getState()) {
-                    throw new ConflictException("StateAction is the same as State");
-                }
-                if (StateAction.stringToStateAction(eventDtoRequest.getStateAction()) == StateAction.PUBLISH_EVENT
-                        && event.getState() == State.CANCELED) {
-                    throw new ConflictException("Incorrect StateAction");
-                }
-                if (StateAction.stringToStateAction(eventDtoRequest.getStateAction()) == StateAction.REJECT_EVENT
-                        && event.getState() == State.PUBLISHED) {
-                    throw new ConflictException("Incorrect StateAction");
-                }
+        var event = eventRepository.findById(eventId)
+                .orElseThrow(() -> new ResourceNotFoundException(String.format("event with id=%d not found", eventId)));
+        if (eventDtoRequest.getStateAction() != null) {
+            if (StateAction.stringToState(eventDtoRequest.getStateAction()) == event.getState()) {
+                throw new ConflictException("StateAction is the same as State");
             }
-            EventMapper.toEvent(event, eventDtoRequest);
-            if (StateAction.stringToStateAction(eventDtoRequest.getStateAction()) == StateAction.PUBLISH_EVENT) {
-                event.setPublishedOn(LocalDateTime.now().withNano(0));
+            if (StateAction.stringToStateAction(eventDtoRequest.getStateAction()) == StateAction.PUBLISH_EVENT
+                    && event.getState() == State.CANCELED) {
+                throw new ConflictException("Incorrect StateAction");
             }
-            event.setState(StateAction.stringToState(eventDtoRequest.getStateAction()));
-            event.setId(eventId);
-            if (eventDtoRequest.getLocation() != null) {
-                Location createdLocation = locationRepository.save(eventDtoRequest.getLocation());
-                event.setLocation(createdLocation);
+            if (StateAction.stringToStateAction(eventDtoRequest.getStateAction()) == StateAction.REJECT_EVENT
+                    && event.getState() == State.PUBLISHED) {
+                throw new ConflictException("Incorrect StateAction");
             }
-            updatedEvent = eventRepository.save(event);
-            log.info("Event updated" + updatedEvent);
-            return EventMapper.toEventDto(updatedEvent);
-        } else {
-            throw new ResourceNotFoundException(String.format("Event with id=%d not found",eventId));
         }
+
+        EventMapper.toEvent(event, eventDtoRequest);
+        if (StateAction.stringToStateAction(eventDtoRequest.getStateAction()) == StateAction.PUBLISH_EVENT) {
+            event.setPublishedOn(LocalDateTime.now().withNano(0));
+        }
+        event.setState(StateAction.stringToState(eventDtoRequest.getStateAction()));
+        event.setId(eventId);
+        if (eventDtoRequest.getLocation() != null) {
+            Location createdLocation = locationRepository.save(eventDtoRequest.getLocation());
+            event.setLocation(createdLocation);
+        }
+        updatedEvent = eventRepository.save(event);
+        log.info("Event updated" + updatedEvent);
+        return EventMapper.toEventDto(updatedEvent);
     }
 
     @Override
@@ -251,16 +233,14 @@ public class EventServiceImpl implements EventService {
                 .uri(request.getRequestURI())
                 .timeStamp(LocalDateTime.now().withNano(0)).build();
         client.createStatistic(statRequestDto);
-        var user = eventRepository.findById(id);
-        if (user.isEmpty()) {
-            throw new ResourceNotFoundException(String.format("User with id=%d not found",id));
-        }
-        return EventMapper.toEventDto(user.get());
+        var user = eventRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException(String.format("User with id=%d not found", id)));
+        return EventMapper.toEventDto(user);
     }
 
     @Override
     public void removeEventPublic(Long id) {
-        eventRepository.deleteAllById(Collections.singleton(id));
+        eventRepository.deleteById(id);
     }
 
     private Pageable sizeAndFromToPageable(Integer from, Integer size) {

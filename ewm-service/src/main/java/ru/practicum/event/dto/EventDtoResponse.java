@@ -5,11 +5,13 @@ import lombok.*;
 import lombok.experimental.NonFinal;
 import org.springframework.format.annotation.DateTimeFormat;
 import ru.practicum.category.model.Category;
+import ru.practicum.comments.model.Comment;
 import ru.practicum.event.model.Location;
 import ru.practicum.event.model.State;
 import ru.practicum.user.model.User;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -56,6 +58,8 @@ public class EventDtoResponse {
     Location location;
     @NonFinal
     State state;
+    @NonFinal
+    List<Comment> comments;
 
 
 }
