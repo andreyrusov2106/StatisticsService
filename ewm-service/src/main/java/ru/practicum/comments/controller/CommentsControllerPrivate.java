@@ -12,7 +12,9 @@ import javax.validation.Valid;
 @RestController
 @RequestMapping(path = "/users/comments")
 public class CommentsControllerPrivate {
+
     private final CommentService commentService;
+
     @Autowired
     public CommentsControllerPrivate(CommentService commentService) {
         this.commentService = commentService;
